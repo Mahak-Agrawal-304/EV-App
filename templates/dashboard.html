@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charging Station Dashboard</title>
+    <style>
+        /* Background similar to login page */
+body {
+    background: linear-gradient(90deg, #e2e2e2, #c9d6ff);
+    font-family: 'Poppins', sans-serif;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+/* Main Dashboard Container */
+.dashboard-container {
+    display: flex;
+    width: 100%;
+    height: 100vh;
+    background: white;
+    border-radius: 0px;
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+}
+
+/* Left Side: Charging Station Details */
+.dashboard-left {
+    width: 40%;
+    background: #7494ec; /* Blue box */
+    padding: 50px;
+    color: white;
+    border-radius: 0px 150px 150px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: left;
+    box-shadow: 0 0 30px rgba(0, 0, 0, .2);
+}
+
+.dashboard-left h2 {
+    margin-top: -100px;
+    margin-bottom: 40px;
+    text-align: center;
+    font-size: 30px;
+}
+
+.dashboard-left p {
+    margin: 10px 10px;
+    font-size: 16px;
+}
+
+/* Right Side: Vehicle List */
+.dashboard-right {
+    width: 60%;
+    padding: 20px;
+    background: white(132, 137, 139);
+    color: black;
+    border-radius: 0 10px 10px 0;
+}
+
+.dashboard-right table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.dashboard-right th, .dashboard-right td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: center;
+}
+
+.dashboard-right th {
+    background-color: #7494ec;
+    color: white;
+}
+
+/* Buttons Styling */
+.btn {
+    border: 2px solid #fff;
+    color: white;
+    background: transparent;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    box-shadow: none;
+    width: 232px;
+    height: 40px;
+    position: absolute;    
+    top: 73%;
+    left: 12.8%;
+}
+
+.btn:hover {
+    background-color: #7494ec;
+    color: white;
+}
+
+.logout-btn {
+    position: absolute;
+    top: 81%;
+    left: 12.5%;
+    background-color: white;
+    color: #7494ec;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-top: 10px;
+    text-align: center;
+    width: 200px;
+}
+
+.logout-btn:hover {
+    background: darkred;
+}
+
+
+/* Vehicle Modal Styling */
+.vehiclemodal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+}
+
+.vehiclemodal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    width: 40%;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.close {
+    float: right;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+/* Center Modal */
+
+.modal {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+}
+
+/* Modal Content */
+.modal-content {
+    background: white;
+    padding: 20px;
+    width: 40%;
+    border-radius: 10px;
+    text-align: center;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal Title */
+.modal-content h2 {
+    margin-bottom: 15px;
+    font-size: 20px;
+    color: #333;
+}
+
+.modal-content label {
+    display: block; /* Ensures labels are above inputs */
+    font-weight: bold;
+    margin-top: 10px;
+    text-align: left;
+    width: 90%;
+    color: #333;
+}
+
+/* Form Fields */
+.modal-content input {
+    width: 90%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+/* Save Button */
+.save-btn {
+    background: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.save-btn:hover {
+    background: #45a049;
+}
+
+
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Left: Charging Station Details -->
+        <div class="dashboard-left">
+            <h2>Welcome,<br> {{ station.name }} <br>Charging Station</h2>
+            <p><strong>Operator:</strong> {{ station.operator }}</p>
+            <p><strong>Charging Type:</strong> {{ station.charging_type }}</p>
+            <p><strong>Location:</strong> {{ station.location }}</p>
+            <p><strong>Total Slots:</strong> {{ station.total_slots }}</p>
+            <p><strong>Available Slots:</strong> {{ station.available_slots }}</p>
+            <p><strong>Charging Rate:</strong> ₹{{ station.charging_rate }} per kWh</p>
+
+            <button onclick="openModal()" class="btn">Update Information</button>
+            <a href="/login.html" class=" logout-btn">Logout</a>
+        </div>
+
+        <!-- Right: List of Vehicles -->
+        <div class="dashboard-right">
+            <h2>Currently Charging Vehicles</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Vehicle Number</th>
+                        <th>Arrival Time</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for vehicle in vehicles %}
+                    <tr>
+                        <td>{{ loop.index }}</td>
+                        <td>{{ vehicle.number }}</td>
+                        <td>{{ vehicle.arrival_time }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    
+
+        <div id="vehicleModal" class="vehiclemodal">
+    <div class="vehiclemodal-content">
+        <span class="close" onclick="closeVehicleModal()">&times;</span>
+        <h2>Add Vehicle</h2>
+        
+        <form id="addVehicleForm">
+            <label>Vehicle Number:</label>
+            <input type="text" id="vehicleNumber" placeholder="Vehicle Number" required>
+
+            <label>Arrival Time:</label>
+            <input type="time" id="arrivalTime" placeholder="Time of arrival" required>
+
+            <button type="submit" class="btn">Add Vehicle</button>
+        </form>
+    </div>
+</div>
+
+
+        <div id="Modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Update Charging Station Details</h2>
+            
+            <form id="updateForm">
+                <label>Station Name:</label>
+                <input type="text" id="stationName" value="{{ station.name }}" placeholder="Station name" required>
+
+                <label>Operator Name:</label>
+                <input type="text" id="operatorName" value="{{ station.operator }}" placeholder="operator Name" required>
+
+
+
+                <label>Location:</label>
+                <input type="text" id="location" value="{{ station.location }}" placeholder="Location" required>
+
+                <label>Total Slots:</label>
+                <input type="number" id="totalSlots" min="1" value="{{ station.total_slots }}" placeholder="Number of slots" required>
+
+                <label>Available Slots:</label>
+                <input type="number" id="availableSlots" min="0" value="{{ station.available_slots }}" placeholder="Available slots" required>
+
+                <label>Charging Rate (₹/kWh):</label>
+                <input type="number" id="chargingRate" min="1" value="{{ station.charging_rate }}" placeholder="Charging rate" required>
+
+                <button type="submit" class="save-btn">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+
+<script>
+    // Open the Add Vehicle Modal
+function openVehicleModal() {
+    document.getElementById("vehicleModal").style.display = "block";
+}
+
+// Close the modal
+function closeVehicleModal() {
+    document.getElementById("vehicleModal").style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    let modal = document.getElementById("vehicleModal");
+    if (event.target === modal) {
+        closeVehicleModal();
+    }
+}
+
+        document.querySelector("save-btn").addEventListener("submit", function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Gather updated values from the form fields
+    let stationName = document.getElementById("stationName").value;
+    let operatorName = document.getElementById("operatorName").value;
+    let chargingType = document.getElementById("chargingType").value;
+    let location = document.getElementById("location").value;
+    let totalSlots = document.getElementById("totalSlots").value;
+    let availableSlots = document.getElementById("availableSlots").value;
+    let chargingRate = document.getElementById("chargingRate").value;
+
+    const requestData = {
+        stationName: stationName,
+        operatorName: operatorName,
+        chargingType: chargingType,
+        location: location,
+        totalSlots: totalSlots,
+        availableSlots: availableSlots,
+        chargingRate: chargingRate
+    };
+
+    console.log("Sending update request:", requestData); // Debugging
+
+    fetch("/update_station", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message || data.error);
+        if (data.message) {
+            // Optionally, close the modal and refresh the dashboard data
+            closeModal();
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error("Update Error:", error));
+});
+
+        // Open the modal
+function openModal() {
+    document.getElementById("updateModal").style.display = "block";
+}
+
+// Close the modal
+function closeModal() {
+    document.getElementById("updateModal").style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    let modal = document.getElementById("updateModal");
+    if (event.target === modal) {
+        closeModal();
+    }
+}
+
+    </script>
+
+</body>
+</html>

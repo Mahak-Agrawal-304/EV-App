@@ -81,6 +81,23 @@ body {
 }
 
 /* Buttons Styling */
+.addbtn{
+    border: 2px solid #fff;
+    color: white;
+    background: #7494ec;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+    box-shadow: none;
+    width: 232px;
+    height: 40px;
+    position: absolute; 
+    margin-top: 10px;
+    top: 4%;
+    left: 81.5%;
+
+}
 .btn {
     border: 2px solid #fff;
     color: white;
@@ -214,7 +231,6 @@ body {
     background: #45a049;
 }
 
-
     </style>
 </head>
 <body>
@@ -230,12 +246,14 @@ body {
             <p><strong>Charging Rate:</strong> ₹{{ station.charging_rate }} per kWh</p>
 
             <button onclick="openModal()" class="btn">Update Information</button>
-            <a href="/login.html" class=" logout-btn">Logout</a>
+            <a href="/" class=" logout-btn">Logout</a>
         </div>
 
         <!-- Right: List of Vehicles -->
         <div class="dashboard-right">
             <h2>Currently Charging Vehicles</h2>
+            <button onclick="openVehicleModal()" class="addbtn">Add Vehicle</button>
+
             <table>
                 <thead>
                     <tr>
@@ -259,7 +277,7 @@ body {
 
     
 
-        <div id="vehicleModal" class="vehiclemodal">
+        <!--div id="vehicleModal" class="vehiclemodal">
     <div class="vehiclemodal-content">
         <span class="close" onclick="closeVehicleModal()">&times;</span>
         <h2>Add Vehicle</h2>
@@ -271,10 +289,10 @@ body {
             <label>Arrival Time:</label>
             <input type="time" id="arrivalTime" placeholder="Time of arrival" required>
 
-            <button type="submit" class="btn">Add Vehicle</button>
+            <button type="submit" class="save-btn">Add Vehicle</button>
         </form>
     </div>
-</div>
+</div-->
 
 
         <div id="Modal" class="modal">
@@ -310,6 +328,74 @@ body {
 
 
 <script>
+    document.querySelector(".save-btn").addEventListener("click", function(event) {
+    event.preventDefault(); // Prevent default form submission
+
+    // Gather updated values from the form fields
+    let stationName = document.getElementById("stationName").value;
+    let operatorName = document.getElementById("operatorName").value;
+    let location = document.getElementById("location").value;
+    let totalSlots = document.getElementById("totalSlots").value;
+    let availableSlots = document.getElementById("availableSlots").value;
+    let chargingRate = document.getElementById("chargingRate").value;
+
+    const requestData = {
+        stationName: stationName,
+        operatorName: operatorName,
+        location: location,
+        totalSlots: totalSlots,
+        availableSlots: availableSlots,
+        chargingRate: chargingRate
+    };
+
+    console.log("Sending update request:", requestData); // Debugging
+
+    fetch("/update_station", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        alert(data.message || data.error);
+        if (data.message) {
+            closeModal();  // Close modal after saving
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error("Update Error:", error));
+});
+
+// Open the Update Information Modal
+function openModal() {
+    document.getElementById("Modal").style.display = "flex";
+}
+
+// Close the Update Information Modal
+function closeModal() {
+    document.getElementById("Modal").style.display = "none";
+}
+
+// Open the Add Vehicle Modal
+function openVehicleModal() {
+    document.getElementById("vehicleModal").style.display = "flex";
+}
+
+// Close the Add Vehicle Modal
+function closeVehicleModal() {
+    document.getElementById("vehicleModal").style.display = "none";
+}
+
+// Close modal when clicking outside of it
+window.onclick = function(event) {
+    let updateModal = document.getElementById("Modal");
+    let vehicleModal = document.getElementById("vehicleModal");
+
+    if (event.target === updateModal) closeModal();
+    if (event.target === vehicleModal) closeVehicleModal();
+};
+
+    /*
     // Open the Add Vehicle Modal
 function openVehicleModal() {
     document.getElementById("vehicleModal").style.display = "block";
@@ -328,13 +414,15 @@ window.onclick = function(event) {
     }
 }
 
-        document.querySelector("save-btn").addEventListener("submit", function(event) {
+    
+ 
+    document.querySelector(".save-btn").addEventListener("click", function(event) {
     event.preventDefault(); // Prevent default form submission
 
     // Gather updated values from the form fields
     let stationName = document.getElementById("stationName").value;
     let operatorName = document.getElementById("operatorName").value;
-    let chargingType = document.getElementById("chargingType").value;
+    //let chargingType = document.getElementById("chargingType").value;
     let location = document.getElementById("location").value;
     let totalSlots = document.getElementById("totalSlots").value;
     let availableSlots = document.getElementById("availableSlots").value;
@@ -371,21 +459,22 @@ window.onclick = function(event) {
 
         // Open the modal
 function openModal() {
-    document.getElementById("updateModal").style.display = "block";
+    document.getElementById("Modal").style.display = "flex";
 }
 
 // Close the modal
 function closeModal() {
-    document.getElementById("updateModal").style.display = "none";
+    document.getElementById("Modal").style.display = "none";
 }
 
 // Close modal when clicking outside of it
 window.onclick = function(event) {
-    let modal = document.getElementById("updateModal");
-    if (event.target === modal) {
-        closeModal();
-    }
-}
+    let updateModal = document.getElementById("Modal");
+    let vehicleModal = document.getElementById("vehicleModal");
+
+    if (event.target === updateModal) closeModal();
+    if (event.target === vehicleModal) closeVehicleModal();
+};*/
 
     </script>
 
